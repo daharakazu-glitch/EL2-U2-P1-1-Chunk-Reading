@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Practice: Unit 2 What are esports?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Noto+Serif:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #f8fafc; }
+        .font-english { font-family: "Times New Roman", Times, "Noto Serif", serif; }
+        .font-japanese { font-family: "UD Digital Kyokasho-tai-R", "UD Digi Kyokasho N-R", "BIZ UDPGothic", "Hiragino Maru Gothic ProN", sans-serif; }
+
+        .boxed-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.4em;
+            height: 1.4em;
+            border: 2px solid #1e293b;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-size: 0.85em;
+            font-weight: bold;
+            line-height: 1;
+            vertical-align: middle;
+            color: #1e293b;
+        }
+
+        .blank-container {
+            display: inline-flex; align-items: center; justify-content: flex-start;
+            height: 2.4em; background-color: #f1f5f9;
+            border-radius: 6px; padding: 0 10px; margin: 4px 3px; vertical-align: middle;
+            color: #64748b; font-weight: bold; font-size: 1em; cursor: pointer; border-bottom: none;
+            transition: all 0.2s ease; user-select: none;
+        }
+        .blank-container:hover { background-color: #e2e8f0; }
+
+        .blank-container.revealed {
+            justify-content: center; background-color: #ffffff !important;
+            color: #ef4444; border: 2px solid #ef4444; 
+            min-width: auto !important; 
+            padding: 0 12px; margin: 2px 3px;
+            cursor: default;
+        }
+
+        .blank-container.target-sentence {
+            background-color: #fffbeb; 
+            color: #d97706;
+        }
+        .blank-container.target-sentence.revealed {
+            color: #ef4444; border-color: #ef4444; background-color: #ffffff !important;
+        }
+
+        .paren { color: #94a3b8; font-size: 1.1em; }
+        .hint-text { margin-left: 4px; white-space: nowrap; }
+        .paren-right { margin-left: auto; }
+
+        .row-container { transition: all 0.3s ease; border-left: 4px solid transparent; }
+        .row-container.active-row { background-color: #eff6ff !important; border-left-color: #3b82f6; }
+
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .pulse-recording { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } 
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-80">
+
+    <nav class="bg-slate-800 text-white p-4 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-book-open text-2xl text-blue-400"></i>
+                <h1 class="text-xl font-bold leading-tight font-english">Unit 2 Reading 1 What are esports?</h1>
+            </div>
+            <div class="text-sm font-medium bg-slate-700 px-4 py-1.5 rounded-full border border-slate-600">
+                <span id="progress-text" class="text-blue-400 font-bold">0/0</span> Revealed
+            </div>
+        </div>
+    </nav>
+
+    <div class="sticky top-[72px] z-40 bg-f8fafc/95 backdrop-blur-sm transition-all border-b border-slate-200 shadow-sm py-3">
+        <div class="max-w-7xl mx-auto px-4 flex flex-wrap gap-3 justify-center md:justify-end items-center">
+            <div class="flex items-center bg-white rounded-full border border-slate-300 p-1 shadow-sm">
+                <button id="btn-play-all" onclick="togglePlayPause()" class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition font-medium text-sm w-24 justify-center">
+                    <i id="play-icon" class="fas fa-play"></i> <span id="play-text">Play</span>
+                </button>
+                <button id="btn-stop-all" onclick="stopAudio()" class="flex items-center gap-2 px-4 py-1.5 rounded-full text-slate-600 hover:bg-slate-100 transition font-medium text-sm ml-1" title="Reset Audio">
+                    <i class="fas fa-stop"></i> <span>Reset</span>
+                </button>
+            </div>
+            <div class="h-6 w-px bg-slate-300 mx-1 hidden md:block"></div>
+            <button id="btn-toggle-jp" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition font-medium text-sm shadow-sm font-japanese">
+                <i class="fas fa-language text-lg text-slate-500"></i> <span>日本語: <b class="text-blue-600">ON</b></span>
+            </button>
+            <button onclick="resetApp()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition font-medium text-sm shadow-sm font-japanese">
+                <i class="fas fa-redo text-slate-500"></i> Reset
+            </button>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <div class="bg-white shadow-md rounded-xl overflow-hidden border border-slate-200">
+            <div class="hidden md:flex bg-slate-100 border-b border-slate-300 text-sm font-bold text-slate-600">
+                <div class="flex-[3] p-4 border-r border-slate-200 font-english">English Text</div>
+                <div class="flex-[2] p-4 font-japanese">Japanese Meaning</div>
+            </div>
+            <div id="app" class="divide-y divide-slate-200"></div>
+        </div>
+    </main>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 shadow-[0_-4px_20_rgba(0,0,0,0.1)] z-50">
+        <div class="max-w-4xl mx-auto flex flex-col gap-4">
+            <div class="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <div class="flex items-center gap-3">
+                    <button id="btn-record" onclick="toggleRecording()" class="w-14 h-14 rounded-full bg-red-100 text-red-600 border-2 border-red-200 flex items-center justify-center hover:bg-red-200 transition shadow-sm">
+                        <i id="record-icon" class="fas fa-microphone text-xl"></i>
+                    </button>
+                    <div class="text-sm">
+                        <div id="recording-status" class="font-bold text-slate-700">Start Recording</div>
+                        <div class="text-xs text-slate-400">Record to check your pronunciation</div>
+                    </div>
+                </div>
+                <div id="audio-player-container" class="hidden flex items-center gap-2">
+                    <audio id="audio-playback" controls class="h-10 w-48 md:w-64"></audio>
+                </div>
+            </div>
+            
+            <div class="flex gap-2">
+                <button id="btn-reveal-all" onclick="revealAll()" class="flex-1 py-4 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-lg shadow-sm transition-all transform active:scale-[0.98]">
+                    Show All
+                </button>
+                <button id="btn-reveal-next" onclick="revealNext()" class="flex-[2] py-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xl shadow-lg flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] border-b-4 border-slate-900 active:border-b-0 active:translate-y-1">
+                    <span>Next Answer</span>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chunks = [
+            { id: 1,  pre: "WHAT ARE ESPORTS?", blank: null, post: "", jp: "eスポーツとは何か？", hint: "" },
+            { id: 2,  pre: "By Jin Hee Lee, May 29th, 2021", blank: null, post: "", jp: "2021年5月29日　ジニ・リー著", hint: "" },
+            { id: 3,  pre: "With the ", blank: "advent", post: " of video game streaming online,", jp: "インターネット上のビデオゲームストリーミングの出現で，", hint: "(a)" },
+            { id: 4,  pre: "esports ", blank: "are attracting more", post: " and ", blank2: "more", post2: " fans and players.", jp: "eスポーツは魅了していることろであるますます多くのファンとプレーヤー達を。", hint: "( )(a)( )", hint2: "( )" },
+            { id: 5,  pre: "", blank: "Worldwide", post: ",", jp: "世界的に，", hint: "(W)" },
+            { id: 6,  pre: "increasing numbers of ", blank: "spectators", post: "", jp: "増え続ける観客数が", hint: "(s)" },
+            { id: 7,  pre: "", blank: "fill", post: " arenas", jp: "競技場を埋めている", hint: "(f)" },
+            { id: 8,  pre: "to watch professional gamers ", blank: "compete", post: ",", jp: "プロのゲーマーが競い合うのを見るために", hint: "(c)" },
+            { id: 9,  pre: "and national sports networks", blank: null, post: "", jp: "そして全国のスポーツネットワークが", hint: "" },
+            { id: 10, pre: "have started producing ", blank: "content", post: " about esports.", jp: "eスポーツに関するコンテンツの制作するようになってきている。", hint: "( )" },
+            { id: 11, pre: "", blank: "Thanks to increasing support", post: "", jp: "増加する支援のおかげで", hint: "( )( )( )( )", isTarget: true },
+            { id: 12, pre: "", blank: "from video game companies, traditional sports networks, and even universities,", post: "", jp: "ゲーム会社や従来のスポーツネットワーク，そして大学さえからもの,", hint: "( )( )( )( )( )( )( )( )( )( )", isTarget: true },
+            { id: 13, pre: "", blank: "the sky is the limit", post: "", jp: "無限の可能性がある", hint: "( )( )( )( )( )", isTarget: true },
+            { id: 14, pre: "", blank: "when it comes to what competitors can achieve in esports.", post: "", jp: "～に関しては競技者がeスポーツで達成できること。", hint: "( )( )( )( )( )( )( )( )( )( )", isTarget: true },
+            { id: 15, pre: "", blank: "Despite", post: " this,", jp: "これにもかかわらず，", hint: "(D)" },
+            { id: 16, pre: "here at SDESF", blank: null, post: "", jp: "ここSDESFでは，", hint: "" },
+            { id: 17, pre: "we often hear this question,", blank: null, post: "", jp: "私たちはこの質問をしばしば耳にする。", hint: "" },
+            { id: 18, pre: "“So, what are esports, ", blank: "exactly", post: "?”", jp: "「じゃあ，eスポーツとは何なのか、正確には？」", hint: "(e)" },
+            { id: 19, pre: "", blank: "Read on", post: " to ", blank2: "find out", post2: "", jp: "見出すためにこのまま読み進めて", hint: "(R)( )", hint2: "(f)( )" },
+            { id: 20, pre: "about what esports are,", blank: null, post: "", jp: "eスポーツとは何かについて,", hint: "" },
+            { id: 21, pre: "how they can help you and,", blank: null, post: "", jp: "どのようにそれらがあなたに役立つのか，また，", hint: "" },
+            { id: 22, pre: "", blank: "despite", post: " what some may ", blank2: "claim", post2: ",", jp: "一部の人が何と主張するとしても，", hint: "(d)", hint2: "(c)" },
+            { id: 23, pre: "why they really are a sport.", blank: null, post: "", jp: "なぜそれらが本当に１つのスポーツなのか。", hint: "" },
+            { id: 24, pre: "WHAT ARE ESPORTS?", blank: null, post: "", jp: "eスポーツとは何か？", hint: "" },
+            { id: 25, pre: "Esports, ", blank: "or", post: " electronic sports,", jp: "eスポーツ, すなわち電子スポーツは,", hint: "( )" },
+            { id: 26, pre: "are a ", blank: "form", post: " of major sports ", blank2: "competition", post2: " ", blank3: "using", post3: " video games.", jp: "メジャースポーツ競技の一形態であるビデオゲームを用いている。", hint: "(f)", hint2: "(com)", hint3: "( )" },
+            { id: 27, pre: "", blank: "Not", post: " to be ", blank2: "confused with", post2: " regular video games,", jp: "通常のビデオゲームと混同されないために（言っておくと），", hint: "( )", hint2: "(c)( )" },
+            { id: 28, pre: "esports ", blank: "involve", post: " playing video games", jp: "eスポーツはビデオゲームをプレーすることを意味する", hint: "(i)" },
+            { id: 29, pre: "in a highly ", blank: "competitive", post: " and strictly ", blank2: "regulated", post2: " environment.", jp: "非常に競争が激しいそして厳密に規制された環境で。", hint: "(c)", hint2: "(r)" },
+            { id: 30, pre: "Players train and work in teams", blank: null, post: "", jp: "プレーヤー達はチームでトレーニングしそして活動する", hint: "" },
+            { id: 31, pre: "to ", blank: "achieve goals", post: "", jp: "目標を達成するために", hint: "(ach)(g)" },
+            { id: 32, pre: "", blank: "in front of", post: " an audience", jp: "観客の前で", hint: "( )(f)( )" },
+            { id: 33, pre: "much in ", blank: "the same way", post: "", jp: "―ほぼ同じように", hint: "( )(s)( )" },
+            { id: 34, pre: "that professional sports players train and ", blank: "compete.", post: "", jp: "プロのスポーツ選手がトレーニングをしそして競い合うのと。", hint: "(c)" }
+        ];
+
+        let state = {
+            jpVisible: true,
+            blanks: [], 
+            currentBlankIndex: 0,
+            mediaRecorder: null,
+            audioChunks: [],
+            isRecording: false,
+            isPlayingAudio: false,
+            currentAudioIndex: -1,
+            preferredVoice: null,
+            audioTimer: null
+        };
+
+        const app = document.getElementById('app');
+        const progressText = document.getElementById('progress-text');
+        
+        function init() {
+            app.innerHTML = '';
+            state.blanks = [];
+            
+            chunks.forEach((chunk, index) => {
+                const row = document.createElement('div');
+                const bgClass = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
+                row.className = `row-container flex flex-col md:flex-row md:items-stretch ${bgClass} border-l-8 border-l-transparent`;
+                row.id = `row-${chunk.id}`;
+
+                let sentenceHtml = `<span class="text-slate-800">${chunk.pre || ""}</span>`;
+                if(chunk.blank) sentenceHtml += createBlankHtml(chunk.id, chunk.blank, chunk.hint, chunk.isTarget);
+                if(chunk.post) sentenceHtml += `<span class="text-slate-800">${chunk.post || ""}</span>`;
+                if(chunk.blank2) sentenceHtml += createBlankHtml(chunk.id, chunk.blank2, chunk.hint2, chunk.isTarget);
+                if(chunk.post2) sentenceHtml += `<span class="text-slate-800">${chunk.post2}</span>`;
+                if(chunk.blank3) sentenceHtml += createBlankHtml(chunk.id, chunk.blank3, chunk.hint3, chunk.isTarget);
+                if(chunk.post3) sentenceHtml += `<span class="text-slate-800">${chunk.post3}</span>`;
+
+                row.innerHTML = `
+                    <div class="flex-[3] p-6 md:border-r md:border-slate-200 flex items-center justify-between gap-4">
+                        <div class="text-2xl font-english leading-relaxed tracking-wide text-slate-900 w-full flex flex-wrap items-center">
+                            ${sentenceHtml}
+                        </div>
+                        <button onclick="playChunkAudio(${index})" class="shrink-0 w-12 h-12 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center transition border border-slate-200" title="Play line audio">
+                            <i class="fas fa-volume-up text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="flex-[2] p-6 flex items-center">
+                        <p class="jp-text text-slate-700 text-lg font-medium leading-relaxed font-japanese transition-opacity duration-300 ${state.jpVisible ? 'opacity-100' : 'opacity-0 select-none'}">${chunk.jp}</p>
+                    </div>
+                `;
+                app.appendChild(row);
+            });
+
+            const blankEls = document.querySelectorAll('.blank-container');
+            blankEls.forEach((el, idx) => {
+                el.onclick = () => revealSpecific(idx);
+                state.blanks[idx].element = el;
+            });
+
+            updateProgress();
+            setupVoice();
+        }
+
+        function setupVoice() {
+            const setVoice = () => {
+                const voices = window.speechSynthesis.getVoices();
+                state.preferredVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Premium'))) 
+                                      || voices.find(v => v.lang.startsWith('en-US')) 
+                                      || voices.find(v => v.lang.startsWith('en'));
+            };
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = setVoice;
+            }
+            setVoice();
+        }
+
+        function getBlankWidth(word) {
+            if (!word) return '100px';
+            const len = word.length;
+            if (len <= 2) return '75px';   
+            if (len <= 5) return '130px';  
+            if (len <= 10) return '180px';  
+            return '250px';                
+        }
+
+        function createBlankHtml(chunkId, word, hint, isTarget = false) {
+            const hintParts = hint ? hint.match(/\([^\)]*\)/g) : null;
+            const wordParts = word ? word.trim().split(/\s+/) : [];
+            let html = "";
+            
+            if (hintParts && hintParts.length > 1 && wordParts.length === hintParts.length) {
+                for (let i = 0; i < hintParts.length; i++) {
+                    html += generateSingleBlank(chunkId, wordParts[i], hintParts[i], isTarget);
+                }
+            } else {
+                html += generateSingleBlank(chunkId, word, hint, isTarget);
+            }
+            return html;
+        }
+
+        function generateSingleBlank(chunkId, word, hint, isTarget = false) {
+            state.blanks.push({ chunkId: chunkId, word: word, isRevealed: false, element: null });
+            let displayHint = hint ? (hint.startsWith('(') && hint.endsWith(')') ? hint.slice(1, -1).trim() : hint.trim()) : '';
+            let classes = "blank-container text-2xl font-english" + (isTarget ? " target-sentence" : "");
+            const dynamicWidth = getBlankWidth(word);
+            
+            return `<span class="${classes}" style="min-width: ${dynamicWidth}">
+                        <span class="paren">(</span>
+                        <span class="hint-text">${displayHint}</span>
+                        <span class="paren paren-right">)</span>
+                    </span>`;
+        }
+
+        function revealNext() {
+            if (state.currentBlankIndex >= state.blanks.length) return; 
+            const target = state.blanks[state.currentBlankIndex];
+            revealBlank(target);
+            state.currentBlankIndex++;
+            highlightRow(target.chunkId);
+            updateProgress();
+        }
+
+        function revealAll() {
+            state.blanks.forEach(blankObj => {
+                if (!blankObj.isRevealed) {
+                    revealBlank(blankObj);
+                }
+            });
+            state.currentBlankIndex = state.blanks.length;
+            updateProgress();
+        }
+
+        function revealSpecific(index) {
+            if (state.blanks[index].isRevealed) return;
+            const target = state.blanks[index];
+            revealBlank(target);
+            if (index === state.currentBlankIndex) state.currentBlankIndex++;
+            highlightRow(target.chunkId);
+            updateProgress();
+        }
+
+        function revealBlank(blankObj) {
+            const el = blankObj.element;
+            if(!el) return;
+            blankObj.isRevealed = true;
+            el.innerHTML = blankObj.word;
+            el.className = "blank-container revealed text-2xl font-english fade-in" + (el.classList.contains('target-sentence') ? ' target-sentence' : '');
+        }
+
+        function highlightRow(chunkId) {
+            document.querySelectorAll('.row-container').forEach(r => r.classList.remove('active-row'));
+            const row = document.getElementById(`row-${chunkId}`);
+            if(row) {
+                row.classList.add('active-row');
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function updateProgress() {
+            const revealedCount = state.blanks.filter(b => b.isRevealed).length;
+            progressText.innerText = `${revealedCount}/${state.blanks.length}`;
+            const btn = document.getElementById('btn-reveal-next');
+            if(revealedCount >= state.blanks.length) {
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                btn.classList.remove('bg-slate-800', 'hover:bg-slate-700');
+                btn.innerHTML = '<i class="fas fa-check"></i> Complete!';
+            } else {
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btn.classList.add('bg-slate-800', 'hover:bg-slate-700');
+                btn.innerHTML = '<span>Next Answer</span><i class="fas fa-chevron-right"></i>';
+            }
+        }
+
+        function resetApp() {
+            stopAudio();
+            state.currentBlankIndex = 0;
+            init();
+            const btn = document.getElementById('btn-record');
+            const icon = document.getElementById('record-icon');
+            const status = document.getElementById('recording-status');
+            const playerContainer = document.getElementById('audio-player-container');
+            if(state.isRecording && state.mediaRecorder) {
+                state.mediaRecorder.stop();
+                state.isRecording = false;
+            }
+            btn.classList.add('bg-red-100', 'text-red-600');
+            btn.classList.remove('bg-red-600', 'text-white', 'pulse-recording');
+            icon.className = "fas fa-microphone text-xl";
+            status.innerText = "Start Recording";
+            status.className = "font-bold text-slate-700";
+            playerContainer.classList.add('hidden');
+        }
+
+        async function toggleRecording() {
+            const btn = document.getElementById('btn-record');
+            const icon = document.getElementById('record-icon');
+            const status = document.getElementById('recording-status');
+            const playerContainer = document.getElementById('audio-player-container');
+            const audioEl = document.getElementById('audio-playback');
+
+            if (!state.isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    state.mediaRecorder = new MediaRecorder(stream);
+                    state.audioChunks = [];
+                    state.mediaRecorder.ondataavailable = event => state.audioChunks.push(event.data);
+                    state.mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(state.audioChunks, { type: 'audio/wav' });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        audioEl.src = audioUrl;
+                        playerContainer.classList.remove('hidden');
+                    };
+                    state.mediaRecorder.start();
+                    state.isRecording = true;
+                    btn.classList.remove('bg-red-100', 'text-red-600');
+                    btn.classList.add('bg-red-600', 'text-white', 'pulse-recording');
+                    icon.className = "fas fa-stop text-xl";
+                    status.innerText = "Recording...";
+                    status.className = "font-bold text-red-600 animate-pulse";
+                    playerContainer.classList.add('hidden'); 
+                } catch (err) {
+                    alert("Mic access denied.");
+                }
+            } else {
+                if (state.mediaRecorder) state.mediaRecorder.stop();
+                state.isRecording = false;
+                btn.classList.add('bg-red-100', 'text-red-600');
+                btn.classList.remove('bg-red-600', 'text-white', 'pulse-recording');
+                icon.className = "fas fa-microphone text-xl";
+                status.innerText = "Start Recording";
+                status.className = "font-bold text-slate-700";
+            }
+        }
+
+        function togglePlayPause() {
+            if (state.isPlayingAudio) {
+                window.speechSynthesis.cancel();
+                state.isPlayingAudio = false;
+                updatePlayBtnUI(false);
+                if (state.audioTimer) clearInterval(state.audioTimer);
+            } else {
+                if (state.currentAudioIndex === -1) state.currentAudioIndex = 0;
+                playNextChunk();
+            }
+        }
+
+        function playNextChunk() {
+            if (state.currentAudioIndex >= chunks.length || state.currentAudioIndex === -1) {
+                stopAudio();
+                return;
+            }
+            state.isPlayingAudio = true;
+            updatePlayBtnUI(true);
+            if (state.audioTimer) clearInterval(state.audioTimer);
+            state.audioTimer = setInterval(() => {
+                if (window.speechSynthesis.speaking) window.speechSynthesis.resume();
+            }, 10000);
+            const chunk = chunks[state.currentAudioIndex];
+            const text = getChunkText(chunk);
+            highlightRow(chunk.id);
+            window.speechSynthesis.cancel();
+            const ut = new SpeechSynthesisUtterance(text);
+            if (state.preferredVoice) ut.voice = state.preferredVoice;
+            ut.lang = 'en-US';
+            ut.rate = 0.85;
+            ut.onend = () => {
+                if (state.isPlayingAudio) {
+                    state.currentAudioIndex++;
+                    playNextChunk();
+                }
+            };
+            ut.onerror = (e) => {
+                if(e.error !== 'interrupted') stopAudio();
+            };
+            setTimeout(() => {
+                window.speechSynthesis.speak(ut);
+            }, 50);
+        }
+
+        function playChunkAudio(index) {
+            stopAudio();
+            const chunk = chunks[index];
+            const text = getChunkText(chunk);
+            highlightRow(chunk.id);
+            const ut = new SpeechSynthesisUtterance(text);
+            if (state.preferredVoice) ut.voice = state.preferredVoice;
+            ut.lang = 'en-US';
+            ut.rate = 0.85;
+            window.speechSynthesis.speak(ut);
+        }
+
+        function stopAudio() {
+            window.speechSynthesis.cancel();
+            if (state.audioTimer) clearInterval(state.audioTimer);
+            state.isPlayingAudio = false;
+            state.currentAudioIndex = -1;
+            updatePlayBtnUI(false);
+            document.querySelectorAll('.row-container').forEach(r => r.classList.remove('active-row'));
+        }
+
+        function updatePlayBtnUI(isPlaying) {
+            const btn = document.getElementById('btn-play-all');
+            const icon = document.getElementById('play-icon');
+            const text = document.getElementById('play-text');
+            if (isPlaying) {
+                icon.className = "fas fa-pause";
+                text.innerText = "Pause";
+                btn.classList.add('bg-amber-500', 'hover:bg-amber-600');
+                btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            } else {
+                icon.className = "fas fa-play";
+                text.innerText = "Play";
+                btn.classList.remove('bg-amber-500', 'hover:bg-amber-600');
+                btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }
+        }
+
+        function getChunkText(chunk) {
+            let fullHtml = (chunk.pre || "") + " " + (chunk.blank || "") + " " + (chunk.post || "");
+            if(chunk.blank2) fullHtml += " " + chunk.blank2 + " " + (chunk.post2 || "");
+            if(chunk.blank3) fullHtml += " " + chunk.blank3 + " " + (chunk.post3 || "");
+            const temp = document.createElement("div");
+            temp.innerHTML = fullHtml;
+            const boxed = temp.querySelectorAll('.boxed-num');
+            boxed.forEach(el => el.remove());
+            return temp.innerText.replace(/\s+/g, ' ').trim();
+        }
+
+        document.getElementById('btn-toggle-jp').addEventListener('click', () => { 
+            state.jpVisible = !state.jpVisible; 
+            const s = document.getElementById('btn-toggle-jp').querySelector('b');
+            const els = document.querySelectorAll('.jp-text');
+            if(state.jpVisible) {
+                s.innerText = "ON"; s.className = "text-blue-600";
+                els.forEach(e => { e.classList.remove('opacity-0', 'select-none'); e.classList.add('opacity-100'); });
+            } else {
+                s.innerText = "OFF"; s.className = "text-gray-400";
+                els.forEach(e => { e.classList.remove('opacity-100'); e.classList.add('opacity-0', 'select-none'); });
+            }
+        });
+        
+        init();
+    </script>
+</body>
+</html>
